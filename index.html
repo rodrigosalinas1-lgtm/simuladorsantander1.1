@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Santander – Simulador de bolsillos (iPhone)</title>
+<style>
+:root{--bg:#f4f4f5;--surf:#fff;--tx:#222;--mut:#6e6e73;--line:#e6e6e8;--red:#ec0000;--redd:#b30000;--free:#a0a0a5;--desk:#d9d6d3;--ok:#13795b;
+--c0:#ec0000;--c1:#f08a00;--c2:#1b8a5a;--c3:#2d6cdf;--c4:#7a3fc4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--surf:#1c1c1e;--tx:#f2f2f7;--mut:#98989f;--line:#38383a;--desk:#111;--ok:#3ecf9b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000;--surf:#1c1c1e;--tx:#f2f2f7;--mut:#98989f;--line:#38383a;--desk:#111;--ok:#3ecf9b;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--desk);display:flex;align-items:center;justify-content:center;font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;color:var(--tx)}
+.phone{position:relative;aspect-ratio:9/16;height:min(100%,880px);max-width:100%;background:var(--bg);border-radius:46px;border:10px solid #1a1a1c;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+@media (max-width:520px){body{display:block}.phone{width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none}}
+.status{background:var(--red);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 26px 6px;font-weight:600;font-size:14px;position:relative;z-index:21}
+.status:after{content:"";position:absolute;left:50%;top:8px;width:92px;height:24px;margin-left:-46px;background:#000;border-radius:14px}
+.bat{display:inline-block;width:24px;height:11px;border:1.5px solid #fff;border-radius:3px;position:relative;vertical-align:middle;margin-left:6px}
+.bat:after{content:"";position:absolute;inset:1px 4px 1px 1px;background:#fff;border-radius:1px}
+.screens{flex:1;overflow-y:auto;overflow-x:hidden}
+.screen{display:none;padding-bottom:16px}.screen.on{display:block}
+svg{display:block}
+.hero{background:var(--red);color:#fff;padding:6px 20px 62px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:19px;letter-spacing:-.5px}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:700;border:0;color:#fff;cursor:pointer;font-family:inherit;font-size:16px;padding:0}
+.hero p{margin:14px 0 0;opacity:.9;font-size:14px}.hero h1{margin:0;font-size:24px;font-weight:700}
+.acct{background:var(--surf);margin:-46px 16px 0;border-radius:14px;padding:16px;border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mut{color:var(--mut);font-size:13px}
+.big{font-size:30px;font-weight:700;letter-spacing:-.8px;margin:2px 0}
+.ibtn{background:none;border:0;color:var(--mut);cursor:pointer;padding:4px}
+.split{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:14px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:16px 10px 2px;text-align:center;font-size:12px}
+.quick button{background:none;border:0;color:var(--tx);font:inherit;cursor:pointer;padding:4px}
+.quick span{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 5px;border-radius:50%;background:var(--surf);color:var(--red);border:1px solid var(--line)}
+h2{font-size:17px;font-weight:700;margin:20px 16px 8px}
+.list{background:var(--surf);margin:0 16px;border-radius:14px;padding:0 14px;border:1px solid var(--line)}
+.list>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.list>div:last-child{border:0}
+.pk,.qr{cursor:pointer;width:100%}.pk .d{width:10px;height:10px;border-radius:50%;background:var(--k);flex:none}.pk .nm{flex:1;display:flex;gap:10px;align-items:center;min-width:0}.pk .nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);margin:0 16px 8px}.bar i{display:block;transition:width .4s}
+.head{background:var(--red);color:#fff;padding:10px 20px 16px}.head h1{margin:0;font-size:22px}.head p{margin:2px 0 0;font-size:13px;opacity:.9}
+.form{background:var(--surf);border-radius:14px;padding:14px;margin:10px 16px;border:1px solid var(--line)}
+label{font-size:12px;color:var(--mut);display:block;margin:10px 0 3px}
+input,select,button{font:inherit}
+input[type=number],input[type=text],select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx)}
+.btn{width:100%;margin-top:14px;border:0;border-radius:26px;padding:13px;background:var(--red);color:#fff;font-weight:600;cursor:pointer}
+.btn:active{background:var(--redd)}.btn.sec{background:transparent;color:var(--red);border:1.5px solid var(--red);margin-top:8px}
+.tip{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:8px 16px;font-size:14px}.tip b{display:block}
+.tabs{display:flex;background:var(--surf);border-top:1px solid var(--line);padding:6px 4px 14px}
+.tabs button{flex:1;background:none;border:0;color:var(--mut);font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs button.on{color:var(--red);font-weight:600}
+.toast{position:absolute;left:16px;right:16px;bottom:88px;background:#222;color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:none}.toast.err{background:var(--redd)}
+:focus-visible{outline:3px solid #2d6cdf;outline-offset:2px}
+.note{font-size:11px;color:var(--mut);text-align:center;padding:10px 20px}
+.ov{position:absolute;inset:0;background:var(--bg);z-index:20;display:none;flex-direction:column;padding-top:38px}
+.ov.on{display:flex}.ov .body{flex:1;overflow-y:auto;padding-bottom:20px}
+.prog{height:6px;background:rgba(255,255,255,.35);border-radius:3px;margin-top:10px}.prog i{display:block;height:100%;background:#fff;border-radius:3px;transition:width .3s}
+.opt{display:block;width:calc(100% - 32px);margin:8px 16px;text-align:left;background:var(--surf);color:var(--tx);border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer}
+.opt:active{border-color:var(--red)}.opt.ok{border-color:var(--ok);background:rgba(19,121,91,.1)}.opt.ko{border-color:var(--redd);background:rgba(236,0,0,.08)}
+.q{margin:16px 16px 4px;font-size:18px;font-weight:600}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surf);border-radius:22px 22px 0 0;padding:16px 16px 26px;z-index:25;transform:translateY(105%);transition:.28s;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.sheet.on{transform:none}
+.pct{display:flex;align-items:center;gap:8px;font-size:13px;margin:7px 0}.pct b{width:42px;text-align:right}.pct .t{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.pct .t i{display:block;height:100%;background:var(--k)}
+.pct span{width:112px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px}
+.bdg{font-size:12px;font-weight:700;color:var(--red);white-space:nowrap}.bdg.done{color:var(--ok)}
+.rw{background:var(--surf);border:1px solid var(--line);border-left:5px solid var(--red);border-radius:14px;margin:14px 16px 0;padding:14px;cursor:pointer}
+.rw .pb{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0 5px}.rw .pb i{display:block;height:100%;background:var(--red)}
+.ans{margin:8px 16px 0;font-size:14px}.ans b.ok{color:var(--ok)}.ans b.ko{color:var(--redd)}
+.res{text-align:center;padding:30px 20px}.res .pts{font-size:40px;font-weight:800;color:var(--red);margin:6px 0}
+.hub{display:none;flex:1;overflow-y:auto}.phone.inhub .hub{display:block}.phone.inhub .screens,.phone.inhub .tabs{display:none}
+.vth{flex:none;width:58px;height:38px;border-radius:8px;background:linear-gradient(135deg,#ec0000,#8a0000);color:#fff;display:grid;place-items:center}
+.vp{display:flex;width:calc(100% - 32px);margin:14px 16px 0;aspect-ratio:16/9;border-radius:12px;background:#111}
+.vp.empty{flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#bbb;font-size:13px}
+textarea{width:100%;margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:13px/1.4 inherit;font-family:inherit;resize:vertical}
+.hub{background:var(--bg)}
+.phone.inhub .status{background:var(--surf);color:var(--tx)}.phone.inhub .bat{border-color:var(--tx)}.phone.inhub .bat:after{background:var(--tx)}
+.hh{background:var(--surf);padding:8px 16px 18px;border-radius:0 0 22px 22px}
+.ini{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;border:0;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;padding:0}
+.tot{font-size:34px;font-weight:800;letter-spacing:-1px}
+.pill{margin-top:8px;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:16px;text-align:center}
+.qa button{background:none;border:0;color:var(--tx);font-family:inherit;font-size:11.5px;cursor:pointer;padding:2px}
+.qa button span{display:grid;place-items:center;width:50px;height:50px;margin:0 auto 5px;border-radius:50%;background:var(--bg);color:var(--red)}
+.rd{color:var(--tx)}
+.fid{width:92px;height:92px;border-radius:50%;background:var(--red);color:#fff;border:0;cursor:pointer;display:grid;place-items:center;padding:0}.fid svg{width:46px;height:46px}.fid:disabled{opacity:.6}
+.scan{display:flex;height:150px;margin:14px 16px 0;border-radius:14px;background:#111;color:#bbb;font-size:13px;align-items:flex-end;justify-content:center;text-align:center;padding:0 20px 12px;position:relative}
+.scan:before{content:"";position:absolute;left:50%;top:40%;width:86px;height:86px;margin:-43px 0 0 -43px;border:3px solid var(--red);border-radius:12px}
+.ccard{margin-top:12px;border-radius:16px;padding:16px;color:#fff;background:linear-gradient(135deg,#ec0000,#8a0000)}
+.ct{cursor:pointer}.ca{width:38px;height:38px;border-radius:50%;background:var(--bg);color:var(--red);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.star{background:none;border:0;font-size:22px;color:#f08a00;cursor:pointer;padding:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.chips button{flex:1;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:16px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="phone inhub" id="phone">
+  <div class="status"><span id="clock">9:41</span><span>5G<span class="bat"></span></span></div>
+  <div class="hub" id="hub">
+    <div class="hh">
+      <div class="row"><div class="row" style="gap:10px"><button class="ini" id="uAv2" aria-label="Área personal"></button><span>Hola, <b id="hName"></b></span></div><span class="rd" data-ic="bell"></span></div>
+      <div class="row" style="margin-top:18px;align-items:flex-end"><div><div class="mut">Tu dinero</div><div class="tot" id="hbTotal"></div></div><button class="ibtn" id="eyeH" aria-label="Modo discreto" data-ic="eye"></button></div>
+      <button class="pill" id="allOpt"><span data-ic="dots" style="display:inline-block;vertical-align:middle;margin-right:4px"></span>Todas las opciones</button>
+      <div class="qa">
+        <button data-qa="mov"><span data-ic="list"></span>Movimientos</button>
+        <button data-qa="tr"><span data-ic="swap"></span>Transferir</button>
+        <button data-qa="pay"><span data-ic="card"></span>Pagar</button>
+        <button data-qa="cart"><span data-ic="doc"></span>Cartolas</button>
+      </div>
+    </div>
+    <h2>Cuentas</h2>
+    <div class="list"><div class="pk" id="goA" role="button" tabindex="0"><div><b>Cuenta Corriente</b><br><span class="mut">0012 3456 4821 · Toca para editar</span></div><div class="row" style="gap:8px"><b id="hbCta"></b><span data-ic="edit"></span></div></div></div>
+    <h2>Tarjetas</h2>
+    <div class="list"><div class="pk" id="goC" role="button" tabindex="0"><div class="nm"><span class="vth" style="width:40px;height:40px;border-radius:10px" data-ic="card"></span><span><b>Tarjeta de débito</b><br><span class="mut">•••• 4821 · <span id="hbCard"></span></span></span></div><span data-ic="chev"></span></div></div>
+    <h2>Ahorro e inversión</h2>
+    <div class="list"><div class="pk" id="goB" role="button" tabindex="0"><div class="nm"><span class="vth" style="width:40px;height:40px;border-radius:50%" data-ic="wallet"></span><span><b>Bolsillos</b><br><span class="mut" id="hbSub"></span></span></div><div class="row" style="gap:6px"><b id="hbAsig"></b><span data-ic="chev"></span></div></div></div>
+    <h2>¿Necesitas ayuda?</h2>
+    <div class="list"><div class="qr" data-qa="na"><span>Preguntas frecuentes</span><span data-ic="chev"></span></div><div class="qr" data-qa="na"><span>Contáctanos</span><span data-ic="chev"></span></div></div>
+    <div class="note">Simulador educativo. No es la app oficial ni mueve dinero real.</div>
+  </div>
+  <div class="screens" id="screens">
+
+    <section class="screen on" id="s-home">
+      <div class="hero">
+        <div class="top"><div class="row" style="gap:10px"><button class="av" id="uAv" aria-label="Menú de usuario"></button><span class="logo">Santander</span></div><span data-ic="bell"></span></div>
+        <p>Hola,</p><h1 id="uName"></h1>
+      </div>
+      <div class="acct">
+        <div class="row"><span class="mut">Cuenta Corriente · 0012 3456 4821</span><button class="ibtn" id="eye" aria-label="Mostrar u ocultar saldo" data-ic="eye"></button></div>
+        <div class="big" id="hFree"></div><div class="mut">Disponible sin asignar</div>
+        <div class="row split"><span class="mut">Saldo total</span><b id="hTotal"></b></div>
+      </div>
+      <div class="quick">
+        <button data-go="mover" data-focus="dep"><span data-ic="plus"></span>Abonar</button>
+        <button data-go="mover"><span data-ic="swap"></span>Transferir</button>
+        <button data-go="aprender"><span data-ic="star"></span>Aprender</button>
+      </div>
+      <div class="rw" id="rwCard" data-go="aprender" role="button" tabindex="0"></div>
+      <h2>Mis bolsillos</h2>
+      <div class="bar" id="bar" role="img" aria-label="Distribución del dinero"></div>
+      <div class="list" id="hPk"></div>
+      <h2>Últimos movimientos</h2><div class="list" id="hLog"></div>
+      <div class="note">Simulador educativo. No es la app oficial ni mueve dinero real.</div>
+    </section>
+
+    <section class="screen" id="s-mover">
+      <div class="head"><h1>Transferir</h1><p>Abona a tu cuenta o reparte entre bolsillos</p></div>
+      <div class="form"><b>Abonar a la cuenta</b>
+        <label for="dep">Monto (CLP), por ejemplo tu sueldo</label>
+        <input id="dep" class="money" type="text" inputmode="numeric" placeholder="500.000">
+        <button class="btn" id="depBtn">Abonar</button></div>
+      <div class="form"><b>Transferir entre bolsillos</b>
+        <label for="from">Desde</label><select id="from"></select>
+        <label for="to">Hacia</label><select id="to"></select>
+        <label for="amt">Monto (CLP)</label><input id="amt" class="money" type="text" inputmode="numeric" placeholder="0">
+        <button class="btn" id="mvBtn">Transferir</button></div>
+    </section>
+
+    <section class="screen" id="s-aprender">
+      <div class="head"><h1>Aprender</h1><p>Educación financiera y Santander Rewards</p></div>
+      <div class="rw" id="rwCard2" style="cursor:default"></div>
+      <h2>Quizzes</h2>
+      <div class="list" id="qList"></div>
+      <div class="tip" style="margin-top:10px"><b>¿Cómo se ganan los puntos?</b>Completa un quiz con todas las respuestas correctas y recibes sus puntos una sola vez. Puedes reintentar las veces que quieras. En Santander Rewards los puntos definen tu nivel y no se canjean; como referencia, un pago automático suma 100 pts y un seguro contratado 200 pts al mes. Nivel 2 desde 10.000 pts y Nivel 3 desde 30.000 pts (más abono mensual de $600.000 o más).</div>
+      <h2>Videos explicativos</h2>
+      <div class="list" id="vList"></div>
+      <div class="form" id="prof"></div>
+      <div class="form"><b>Calculadora de ahorro</b><div class="mut">Mira cómo crece tu plata con interés compuesto.</div>
+        <label for="cm">Ahorro mensual (CLP)</label><input id="cm" class="money" type="text" inputmode="numeric" value="50.000">
+        <label for="cy">Plazo</label><select id="cy"><option value="1">1 año</option><option value="3">3 años</option><option value="5" selected>5 años</option><option value="10">10 años</option></select>
+        <label for="cr">Rentabilidad anual (%)</label><input id="cr" type="number" value="5" min="0" step="0.5">
+        <div id="cout" style="margin-top:12px;font-size:14px"></div></div>
+      <h2>Conceptos clave</h2>
+      <div class="tip"><b>Regla 50/30/20</b>50% necesidades, 30% deseos y 20% ahorro. Tu perfil la ajusta a tu realidad.</div>
+      <div class="tip"><b>Fondo de emergencia</b>De 3 a 6 meses de gastos básicos, guardado para imprevistos.</div>
+      <div class="tip"><b>Interés compuesto</b>Ganas intereses sobre tus intereses. Mientras antes empiezas, más pesa.</div>
+      <div class="tip"><b>Págate primero</b>Reparte el sueldo apenas llega. Lo que queda sin asignar se gasta más fácil.</div>
+      <div style="padding:0 16px"><button class="btn" id="sugg">Aplicar distribución de mi perfil</button>
+      <button class="btn sec" id="redo">Rehacer encuesta</button>
+      <button class="btn sec" id="reset">Reiniciar simulador</button></div>
+    </section>
+  </div>
+
+  <div class="ov" id="ob"><div class="head" id="obHead"></div><div class="body" id="obBody"></div></div>
+  <div class="ov" id="qz"><div class="head" id="qzHead"></div><div class="body" id="qzBody"></div></div>
+  <div class="ov" id="vd"><div class="head" id="vdHead"></div><div class="body" id="vdBody"></div></div>
+  <div class="sheet" id="sheet">
+    <b>Editar bolsillo</b>
+    <label for="shN">Nombre</label><input id="shN" type="text" maxlength="24">
+    <label for="shG">Meta opcional (CLP)</label><input id="shG" class="money" type="text" inputmode="numeric" placeholder="Sin meta">
+    <button class="btn" id="shOk">Guardar</button>
+  </div>
+  <div class="sheet" id="uSheet">
+    <b id="uSn"></b>
+    <p class="mut" style="margin:6px 0 0">Al cerrar sesión se borran los datos del simulador (saldos, bolsillos y puntos) y volverás a la pantalla de ingreso. Al entrar de nuevo a Bolsillos podrás hacer la encuesta otra vez.</p>
+    <button class="btn" id="lo">Cerrar sesión</button>
+    <button class="btn sec" id="loc">Cancelar</button>
+  </div>
+  <div class="ov" id="mv"><div class="head"><div class="row"><h1>Movimientos</h1><button class="ibtn" id="mvX" style="color:#fff;font-weight:600">Salir</button></div><p>Cuenta Corriente y bolsillos</p></div><div class="body" id="mvBody"></div></div>
+  <div class="sheet" id="optSheet">
+    <b>Todas las opciones</b>
+    <div class="list" style="margin:10px 0 0;border:0;padding:0;max-height:300px;overflow-y:auto">
+      <div class="qr" data-qa="mov"><span>Movimientos</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="tr"><span>Transferir</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="pay"><span>Pagar cuentas</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="qr"><span>Pago QR</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="cart"><span>Cartolas</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="card"><span>Tarjetas</span><span data-ic="chev"></span></div>
+      <div class="qr" data-qa="b"><span>Bolsillos</span><span data-ic="chev"></span></div>
+    </div>
+    <button class="btn sec" id="optX">Cerrar</button>
+  </div>
+  <div class="ov on" id="login" style="background:var(--surf);justify-content:center;align-items:center;text-align:center;padding:38px 24px 24px">
+    <div class="logo" style="color:var(--red);font-size:32px">Santander</div>
+    <p class="mut" style="margin:6px 0 44px">Ingresa a tu App</p>
+    <button class="fid" id="faceBtn" aria-label="Ingresar con reconocimiento facial" data-ic="face"></button>
+    <div id="faceTxt" style="margin-top:16px;font-weight:600">Ingresar con Face ID</div>
+    <p class="mut" style="margin-top:6px;max-width:240px">Simulación: no usa tu rostro ni datos reales.</p>
+  </div>
+  <div class="ov" id="pay"><div class="head"><div class="row"><h1>Pagar</h1><button class="ibtn" id="payX" style="color:#fff;font-weight:600">Salir</button></div><p>Pago QR o pago de cuentas</p></div>
+    <div class="body"><div class="scan" id="scan">Apunta al código QR del comercio (simulado)</div>
+      <div class="form"><label for="payK" style="margin-top:0">Tipo de pago</label><select id="payK"><option value="Pago QR">Pago QR</option><option value="Pago de cuenta">Pagar cuentas</option></select>
+      <label for="payW">Comercio o servicio</label><input id="payW" type="text" maxlength="30" placeholder="Ej: Cafetería, luz, agua">
+      <label for="payA">Monto (CLP)</label><input id="payA" class="money" type="text" inputmode="numeric" placeholder="0">
+      <label for="payF">Pagar desde</label><select id="payF"></select>
+      <button class="btn" id="payGo">Pagar</button></div></div></div>
+  <div class="ov" id="trf"><div class="head"><div class="row"><h1>Transferir</h1><button class="ibtn" id="trfX" style="color:#fff;font-weight:600">Salir</button></div><p id="trfHead">Elige un contacto</p></div><div class="body" id="trfBody"></div></div>
+  <div class="ov" id="cart"><div class="head"><div class="row"><h1>Cartolas</h1><button class="ibtn" id="cartX" style="color:#fff;font-weight:600">Salir</button></div><p>Resumen mensual de tu cuenta</p></div><div class="body" id="cartBody"></div></div>
+  <div class="sheet" id="acSheet"><b>Modificar monto de la cuenta</b>
+    <p class="mut" style="margin:4px 0 0">Es el dinero disponible sin asignar a bolsillos.</p>
+    <label for="acA">Nuevo monto (CLP)</label><input id="acA" class="money" type="text" inputmode="numeric" placeholder="0">
+    <div class="chips"><button data-add="10000">+10.000</button><button data-add="50000">+50.000</button><button data-add="100000">+100.000</button><button data-add="500000">+500.000</button></div>
+    <button class="btn" id="acOk">Guardar</button><button class="btn sec" id="acX">Cancelar</button></div>
+  <div class="sheet" id="cardSheet"><b>Tarjeta de débito</b>
+    <div class="ccard" id="ccard"><div class="row"><b style="font-size:18px">Santander</b><span style="font-size:12px">Débito</span></div><div style="font-size:20px;letter-spacing:2px;margin-top:22px">•••• •••• •••• 4821</div><div style="font-size:12px;margin-top:10px" id="ccName"></div></div>
+    <p class="mut" style="margin:10px 0 0">Estado: <b id="ccSt"></b></p>
+    <button class="btn" id="ccBtn"></button><button class="btn sec" id="ccX">Cerrar</button></div>
+  <div class="toast" id="toast" role="status"></div>
+  <nav class="tabs" id="tabs">
+    <button data-go="home" class="on"><span data-ic="home"></span>Inicio</button>
+    <button data-go="mover"><span data-ic="swap"></span>Transferir</button>
+    <button data-go="aprender"><span data-ic="star"></span>Aprender</button>
+    <button id="toHub"><span data-ic="user"></span>Mi cuenta</button>
+  </nav>
+</div>
+
+<script>
+const COLORS=['--c0','--c1','--c2','--c3','--c4'];
+const IC={home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',swap:'<path d="M7 7h13M16 3l4 4-4 4M17 17H4M8 13l-4 4 4 4"/>',star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',plus:'<path d="M12 5v14M5 12h14"/>',bell:'<path d="M6 17v-6a6 6 0 1112 0v6l1.5 2h-15zM10 21h4"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',chev:'<path d="M9 6l6 6-6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',play:'<path d="M8 5v14l11-7z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',wallet:'<path d="M3 7h16a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2zM3 7l12-3v3M16 14h2"/>',edit:'<path d="M4 20h4l10-10-4-4L4 16zM13 7l4 4"/>',face:'<path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M9 10v1M15 10v1M12 10v4h-1M9 16c1 1 5 1 6 0"/>',list:'<path d="M5 6h14M5 12h14M5 18h9"/>',doc:'<path d="M7 3h8l4 4v14H7zM14 3v5h5M10 13h6M10 17h6"/>',card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',dots:'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'};
+const ico=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ico(e.dataset.ic));
+const dots=s=>String(s).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fmt=n=>'$'+dots(Math.round(n));
+const num=dots;
+const pv=id=>+String(document.getElementById(id).value).replace(/\D/g,'')||0;
+document.addEventListener('input',e=>{const t=e.target;if(t.classList&&t.classList.contains('money'))t.value=dots(t.value.replace(/\D/g,'').replace(/^0+(?=\d)/,''))});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({free:0,profile:null,pts:0,done:{},blocked:false,fav:{},pockets:[0,1,2,3,4].map(i=>({name:'Bolsillo '+(i+1),amt:0,goal:0})),log:[]});
+let S,hide=false;
+try{S=JSON.parse(localStorage.getItem('santander-bolsillos-v2')||'null')}catch(e){S=null}
+if(!S||!S.pockets||S.pockets.length!==5)S=fresh();
+S.pts=S.pts||0;S.done=S.done||{};S.fav=S.fav||{};S.blocked=!!S.blocked;
+const save=()=>{try{localStorage.setItem('santander-bolsillos-v2',JSON.stringify(S))}catch(e){}};
+let tt;function toast(t,err){const e=$('toast');e.textContent=t;e.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>e.className='toast',2600)}
+const addLog=(t,v)=>{S.log.unshift({t,v,d:new Date().toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})});S.log=S.log.slice(0,40)};
+const label=k=>k==='free'?'Cuenta (sin asignar)':k==='out'?'Gasto (sale de la cuenta)':S.pockets[+k].name||'Bolsillo '+(+k+1);
+const get=k=>k==='free'?S.free:S.pockets[+k].amt;
+const set=(k,v)=>{if(k==='free')S.free=v;else if(k!=='out')S.pockets[+k].amt=v};
+
+/* ---------- Quizzes (puntos Rewards) ---------- */
+const QUIZ=[
+ {id:'ahorro',t:'Ahorro básico',lv:'Fácil',pts:100,q:[
+  ['¿Cuál es la mejor forma de ahorrar de manera constante?',['Ahorrar lo que sobre a fin de mes','Separar un monto fijo apenas recibes tu sueldo','Esperar a tener una meta grande'],1,'Pagarte primero evita que el ahorro dependa de la fuerza de voluntad.'],
+  ['Una buena meta de ahorro tiene...',['Monto, plazo y propósito claros','Solo un deseo general','Ninguna fecha'],0,'Con monto y plazo puedes medir tu avance.'],
+  ['Si ahorras $50.000 al mes, ¿cuánto juntas en un año sin intereses?',['$500.000','$600.000','$650.000'],1,'50.000 × 12 = 600.000.'],
+  ['El dinero que usarás en menos de 6 meses conviene tenerlo en...',['Algo muy riesgoso','Un instrumento de bajo riesgo y fácil acceso','Acciones'],1,'Si lo necesitas pronto, no conviene exponerlo a bajas de precio.']]},
+ {id:'presupuesto',t:'Presupuesto 50/30/20',lv:'Fácil',pts:150,q:[
+  ['En la regla 50/30/20, ¿qué representa el 30%?',['Deseos','Necesidades','Ahorro'],0,'50% necesidades, 30% deseos y 20% ahorro.'],
+  ['¿Cuál de estos es una necesidad?',['Suscripción de streaming','Arriendo','Salida a comer'],1,'Vivienda, cuentas básicas, comida y transporte son necesidades.'],
+  ['Ganas $800.000 al mes. Según 50/30/20, ¿cuánto va a ahorro?',['$80.000','$160.000','$240.000'],1,'El 20% de 800.000 es 160.000.'],
+  ['Te pasaste del presupuesto de deseos este mes. Lo mejor es...',['Sacar del ahorro sin registrar','Revisar en qué te pasaste y ajustar el mes siguiente','Ignorarlo'],1,'Registrar y ajustar te ayuda a corregir el hábito.']]},
+ {id:'deudas',t:'Deudas y tarjetas de crédito',lv:'Medio',pts:200,q:[
+  ['Si tienes varias deudas, ¿cuál conviene pagar primero?',['La de menor tasa','La de mayor tasa de interés','La más nueva'],1,'Es la que más te cuesta cada mes.'],
+  ['Pagar solo el mínimo de la tarjeta suele significar...',['No pagar intereses','Pagar más intereses y tardar más en salir de la deuda','Bajar la deuda rápido'],1,'El saldo restante sigue generando intereses.'],
+  ['¿Qué es el CAE?',['Carga Anual Equivalente: el costo total anual de un crédito','Un descuento en tiendas','Un tipo de seguro'],0,'Sirve para comparar créditos de forma justa.'],
+  ['Antes de tomar un crédito de consumo, lo más prudente es...',['Mirar solo la cuota mensual','Comparar el CAE y el costo total','Aceptar la primera oferta'],1,'La cuota baja puede esconder un costo total alto.']]},
+ {id:'emergencia',t:'Fondo de emergencia y seguros',lv:'Medio',pts:200,q:[
+  ['Un fondo de emergencia debería cubrir...',['1 semana de gastos','3 a 6 meses de gastos básicos','Solo tus deseos'],1,'Te protege si pierdes ingresos.'],
+  ['¿Para qué sirve un seguro?',['Para ganar intereses','Para traspasar el costo de un riesgo grande a una aseguradora','Para no pagar impuestos'],1,'Cubre eventos que no podrías pagar de golpe.'],
+  ['¿Dónde conviene tener el fondo de emergencia?',['Donde puedas sacarlo rápido y con poco riesgo','En inversiones a 10 años','En una compra grande'],0,'Lo importante es liquidez y bajo riesgo.'],
+  ['Usaste parte del fondo en una emergencia real. Después...',['No haces nada','Lo repones de a poco hasta la meta','Cierras el bolsillo'],1,'Reponerlo te deja protegido para la próxima.']]},
+ {id:'inversion',t:'Inversión e interés compuesto',lv:'Avanzado',pts:250,q:[
+  ['El interés compuesto significa que...',['Ganas intereses sobre tu capital y sobre los intereses anteriores','Solo ganas sobre el primer depósito','Pagas más comisión'],0,'Por eso empezar temprano pesa tanto.'],
+  ['En general, ¿cómo se relacionan riesgo y rentabilidad esperada?',['A mayor rentabilidad esperada, mayor riesgo','Son independientes','Más rentabilidad significa menos riesgo'],0,'Nadie ofrece alta rentabilidad sin riesgo.'],
+  ['¿Qué significa diversificar?',['Poner todo en un solo activo','Repartir tu dinero en distintos activos para reducir riesgo','Cambiar de banco cada mes'],1,'Así una mala noticia no afecta todo tu dinero.'],
+  ['Un depósito a plazo se caracteriza por...',['Invertir por un plazo definido con una tasa pactada','Comprar acciones de una empresa','Prestar dinero a un amigo'],0,'Sabes de antemano cuánto ganarás al vencimiento.']]},
+ {id:'seguridad',t:'Fraudes y seguridad digital',lv:'Avanzado',pts:300,q:[
+  ['Te llaman diciendo ser del banco y piden tu clave. Debes...',['Dársela si suena convincente','Cortar y llamar tú al número oficial del banco','Enviarla por WhatsApp'],1,'El banco nunca te pide tus claves por teléfono.'],
+  ['¿Qué es el phishing?',['Un engaño por correo o mensaje que imita a una entidad para robar tus datos','Un tipo de inversión','Un seguro'],0,'Desconfía de links en mensajes inesperados.'],
+  ['Una buena práctica con tus claves es...',['Usar la misma en todo','Usar claves distintas y activar la doble autenticación','Guardarlas en notas del teléfono'],1,'Una clave filtrada no debería abrir todas tus cuentas.'],
+  ['Ves un cargo que no reconoces. Lo primero es...',['Esperar al mes siguiente','Bloquear la tarjeta y avisar al banco de inmediato','Ignorarlo'],1,'Actuar rápido limita el daño.']]}
+];
+const lvl=()=>S.pts>30000?3:S.pts>10000?2:1;
+function rwHTML(){const L=lvl(),next=L===1?10000:L===2?30000:null,pc=next?Math.min(100,S.pts/next*100):100;
+  return `<div class="row"><b>Santander Rewards</b><span class="chip">Nivel ${L}</span></div>
+  <div style="font-size:26px;font-weight:800;margin-top:4px">${num(S.pts)} <span class="mut">puntos</span></div>
+  <div class="pb"><i style="width:${pc}%"></i></div>
+  <div class="mut">${next?`Te faltan ${num(next-S.pts)} puntos para el Nivel ${L+1}`:'Alcanzaste el nivel más alto'}</div>`}
+function drawQList(){
+  $('qList').innerHTML=QUIZ.map(z=>{const d=S.done[z.id];
+    return `<div class="qr" data-z="${z.id}" role="button" tabindex="0"><span><b>${z.t}</b><br><span class="mut">${z.q.length} preguntas · ${z.lv}</span></span><span class="row" style="gap:6px"><span class="bdg ${d?'done':''}">${d?'Completado':'+'+z.pts+' pts'}</span>${ico('chev',18)}</span></div>`}).join('')}
+let Z=null,zi=0,zs=0;
+function openQuiz(id){Z=QUIZ.find(z=>z.id===id);zi=0;zs=0;$('qz').classList.add('on');drawQuestion()}
+function closeQuiz(){$('qz').classList.remove('on');render()}
+function drawQuestion(){
+  const q=Z.q[zi];
+  $('qzHead').innerHTML=`<div class="row"><h1>${Z.t}</h1><button class="ibtn" id="qx" style="color:#fff;font-weight:600">Salir</button></div><p>Pregunta ${zi+1} de ${Z.q.length} · Gana ${Z.pts} puntos con todas correctas</p><div class="prog"><i style="width:${zi/Z.q.length*100}%"></i></div>`;
+  $('qzBody').innerHTML=`<div class="q">${q[0]}</div>${q[1].map((o,i)=>`<button class="opt" data-a="${i}">${o}</button>`).join('')}<div id="qa"></div>`;
+  $('qx').onclick=closeQuiz;
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=+b.dataset.a,ok=a===q[2];if(ok)zs++;
+    document.querySelectorAll('[data-a]').forEach(x=>{x.disabled=true;if(+x.dataset.a===q[2])x.classList.add('ok');else if(x===b)x.classList.add('ko')});
+    $('qa').innerHTML=`<div class="ans"><b class="${ok?'ok':'ko'}">${ok?'Correcto.':'Incorrecto.'}</b> ${q[3]}</div><div style="padding:0 16px"><button class="btn" id="qn">${zi+1<Z.q.length?'Siguiente':'Ver resultado'}</button></div>`;
+    $('qn').onclick=()=>{zi++;zi<Z.q.length?drawQuestion():drawResult()}})}
+function drawResult(){
+  const all=zs===Z.q.length,first=all&&!S.done[Z.id];
+  if(first){S.done[Z.id]=true;S.pts+=Z.pts;save()}
+  $('qzHead').innerHTML=`<h1>${Z.t}</h1><p>Resultado: ${zs} de ${Z.q.length} correctas</p>`;
+  $('qzBody').innerHTML=`<div class="res"><div class="mut">${first?'¡Quiz completado!':all?'Quiz ya completado antes':'Casi lo logras'}</div>
+  <div class="pts">${first?'+'+Z.pts:all?'0':zs+'/'+Z.q.length}</div>
+  <p>${first?'Sumaste puntos Santander Rewards. Tu nivel puede subir con el tiempo.':all?'Los puntos de este quiz ya se habían otorgado.':'Necesitas todas las respuestas correctas para ganar los puntos.'}</p></div>
+  <div style="padding:0 16px">${all?'':'<button class="btn" id="qre">Reintentar</button>'}<button class="btn ${all?'':'sec'}" id="qdone">Volver a Aprender</button></div>`;
+  if(!all)$('qre').onclick=()=>openQuiz(Z.id);
+  $('qdone').onclick=closeQuiz;
+  if(first)toast(`+${Z.pts} puntos Santander Rewards`)}
+$('qList').addEventListener('click',e=>{const r=e.target.closest('[data-z]');if(r)openQuiz(r.dataset.z)});
+$('qList').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('[data-z]');if(r)openQuiz(r.dataset.z)}});
+
+/* ---------- Videos explicativos (generados con IA) ---------- */
+/* Para dejar un video fijo, pon su ruta o URL en el campo src. */
+const VID=[
+ {id:'v1',t:'El poder de pagarte primero',d:'Ahorro',dur:'≈ 40 s',src:'',g:'Narración: Ahorrar no es guardar lo que sobra, es separar primero tu parte. Apenas llega tu sueldo, aparta un monto fijo, por ejemplo 10% o 20%, y recién después gastas. Ponle un nombre y una meta a ese dinero, como viaje o computador, y verás cómo $50.000 al mes se transforman en $600.000 al año. Págate primero.\nVisuales: persona joven recibiendo su sueldo en el celular y repartiéndolo en bolsillos de colores; gráfico simple que crece mes a mes.\nEstilo: animación limpia en rojo y blanco.'},
+ {id:'v2',t:'La regla 50/30/20',d:'Presupuesto',dur:'≈ 40 s',src:'',g:'Narración: La regla 50/30/20 es una forma simple de ordenar tu plata. El 50% va a necesidades, como arriendo, cuentas y comida. El 30% a deseos, como salidas y suscripciones. Y el 20% a ahorro. Si ganas $800.000, son $400.000, $240.000 y $160.000. No es una ley: ajústala a tu realidad.\nVisuales: un sueldo de $800.000 dividiéndose en tres bolsillos con sus montos.\nEstilo: infografía animada.'},
+ {id:'v3',t:'Tarjetas y deudas: cómo no caer',d:'Deudas',dur:'≈ 45 s',src:'',g:'Narración: Pagar solo el mínimo de la tarjeta parece cómodo, pero te cobra intereses por mucho más tiempo. Si tienes varias deudas, paga primero la de mayor tasa. Antes de pedir un crédito, compara el CAE, la Carga Anual Equivalente, que muestra el costo total, y no mires solo la cuota.\nVisuales: una tarjeta cuyo saldo baja lento al pagar el mínimo y rápido al pagar más; etiqueta CAE comparando dos créditos.\nEstilo: animación limpia, tono cercano.'},
+ {id:'v4',t:'Fondo de emergencia: tu colchón',d:'Emergencia y seguros',dur:'≈ 45 s',src:'',g:'Narración: Un fondo de emergencia es tu colchón para imprevistos: una falla del auto, una cuenta médica o quedarte sin ingresos. La meta es de 3 a 6 meses de gastos básicos, en un lugar donde puedas sacar el dinero rápido y con poco riesgo. Si lo usas, repónlo de a poco. Los seguros complementan esta protección.\nVisuales: un paraguas sobre un bolsillo verde mientras llueve; calendario marcando de 3 a 6 meses.\nEstilo: animación limpia.'},
+ {id:'v5',t:'Interés compuesto: tu mejor aliado',d:'Inversión',dur:'≈ 50 s',src:'',g:'Narración: El interés compuesto es ganar intereses sobre tus intereses. Imagina ahorrar $50.000 al mes durante 5 años con una rentabilidad anual de 5%: depositas $3.000.000 y terminas con más, porque tus ganancias también ganan. Mientras antes empieces, más trabaja el tiempo a tu favor. Y recuerda: a mayor rentabilidad esperada, mayor riesgo, por eso conviene diversificar.\nVisuales: una bola de nieve que crece rodando; gráfico con dos líneas, lo depositado y el total.\nEstilo: infografía animada.'},
+ {id:'v6',t:'Cómo evitar fraudes digitales',d:'Seguridad',dur:'≈ 50 s',src:'',g:'Narración: Los fraudes digitales buscan que tú entregues tus datos. El banco nunca te pide tu clave por teléfono, WhatsApp o correo. Si te llaman, corta y comunícate tú al número oficial. Desconfía de links en mensajes inesperados, usa claves distintas y activa la doble autenticación. Si ves un cargo que no reconoces, bloquea la tarjeta y avisa al banco de inmediato.\nVisuales: celular recibiendo un mensaje sospechoso con alerta roja; candado y check verde al bloquear la tarjeta.\nEstilo: animación limpia, tono de alerta amable.'}
+];
+const VL={};
+function drawVList(){$('vList').innerHTML=VID.map(v=>{const ok=v.src||VL[v.id];return `<div class="qr" data-v="${v.id}" role="button" tabindex="0"><span class="row" style="gap:12px;justify-content:flex-start"><span class="vth">${ico('play',18)}</span><span><b>${v.t}</b><br><span class="mut">${v.d} · ${v.dur}</span></span></span><span class="row" style="gap:6px"><span class="bdg ${ok?'done':''}">${ok?'Ver':'Por cargar'}</span>${ico('chev',18)}</span></div>`}).join('')}
+function closeVid(){$('vd').classList.remove('on');$('vdBody').innerHTML='';drawVList()}
+function openVid(id){const v=VID.find(x=>x.id===id),src=v.src||VL[id];
+  $('vdHead').innerHTML=`<div class="row"><h1>${v.t}</h1><button class="ibtn" id="vx" style="color:#fff;font-weight:600">Salir</button></div><p>Video explicativo · ${v.d}</p>`;
+  $('vdBody').innerHTML=(src?`<video class="vp" controls playsinline src="${esc(src)}"></video>`:`<div class="vp empty">${ico('play',44)}<span>Aquí irá el video generado con IA</span></div>`)+
+  `<div style="padding:0 16px"><button class="btn sec" id="vload" style="margin-top:12px">${src?'Cambiar video':'Cargar video desde mi dispositivo'}</button><input type="file" id="vfile" accept="video/*" hidden></div>
+  <div class="form"><b>Guion para generar el video con IA</b><textarea id="vg" readonly rows="8" aria-label="Guion">${esc(v.g)}</textarea><button class="btn" id="vcp">Copiar guion</button></div>
+  <div class="tip">Un video cargado desde tu dispositivo dura solo mientras esta página esté abierta. Para dejarlo fijo en tu proyecto, escribe su ruta en el campo src de este video, dentro de la lista VID del código.</div>`;
+  $('vx').onclick=closeVid;
+  $('vload').onclick=()=>$('vfile').click();
+  $('vfile').onchange=e=>{const f=e.target.files[0];if(!f)return;VL[id]=URL.createObjectURL(f);openVid(id);toast('Video cargado.')};
+  $('vcp').onclick=async()=>{try{await navigator.clipboard.writeText(v.g);toast('Guion copiado.')}catch(err){$('vg').select();toast('Selecciona el texto y cópialo manualmente.',1)}};
+  $('vd').classList.add('on')}
+$('vList').addEventListener('click',e=>{const r=e.target.closest('[data-v]');if(r)openVid(r.dataset.v)});
+$('vList').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('[data-v]');if(r)openVid(r.dataset.v)}});
+
+/* ---------- Encuesta y perfil ---------- */
+const STEPS=[
+ {k:'name',q:'¿Cómo te llamas?',type:'text',ph:'Tu nombre'},
+ {k:'income',q:'¿Cuánto dinero recibes al mes (CLP)?',type:'num',ph:'600.000'},
+ {k:'rent',q:'¿Cuánto pagas de arriendo o dividendo?',type:'num0',ph:'0',exp:1},
+ {k:'food',q:'¿Cuánto gastas en comida al mes?',type:'num0',ph:'0',exp:1},
+ {k:'transp',q:'¿Cuánto gastas en transporte?',type:'num0',ph:'0',exp:1},
+ {k:'bills',q:'¿Cuánto pagas en cuentas básicas? (luz, agua, internet, celular)',type:'num0',ph:'0',exp:1},
+ {k:'other',q:'¿Cuánto gastas en salud o educación?',type:'num0',ph:'0',exp:1},
+ {k:'debt',q:'¿Tienes deudas (tarjeta, crédito de consumo)?',opts:['No tengo deudas','Tengo, pero son pequeñas','Tengo deudas importantes']},
+ {k:'emerg',q:'¿Cuánto tienes ahorrado para emergencias?',opts:['Nada','Menos de 3 meses de gastos','3 meses o más']},
+ {k:'goal',q:'¿Cuál es tu objetivo principal?',opts:['Viajar o darme un gusto','Comprar algo importante','Estudiar o capacitarme','Empezar a invertir','Tener un colchón de seguridad']},
+ {k:'habit',q:'¿Cómo describes tu forma de gastar?',opts:['Gasto más de lo que debería','Soy equilibrado/a','Soy bastante ahorrador/a']}
+];
+let step=0,ans={};
+function showSurvey(){step=0;ans={};$('ob').classList.add('on');$('tabs').style.display='none';drawStep()}
+function drawStep(){
+  const s=STEPS[step];
+  $('obHead').innerHTML=`<h1>${step===0?'Crea tu perfil de Bolsillos':'Conozcámonos'}</h1><p>${STEPS.length} preguntas cortas · es opcional, puedes omitirla</p><div class="prog"><i style="width:${(step+1)/STEPS.length*100}%"></i></div>`;
+  const sumE=STEPS.filter(x=>x.exp&&ans[x.k]).reduce((a,x)=>a+ans[x.k],0);
+  let h=`<div class="q">${s.q}</div>`;
+  if(s.opts)h+=s.opts.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join('');
+  else h+=`<div class="form"><input id="obIn" ${s.type!=='text'?'class="money" type="text" inputmode="numeric"':'type="text" maxlength="30"'} placeholder="${s.ph}" aria-label="${esc(s.q)}">${s.exp?`<div class="mut" style="margin-top:8px">Si no aplica, déjalo en 0.${sumE>0?' Llevas '+fmt(sumE)+' en gastos obligatorios.':''}</div>`:''}<button class="btn" id="obNext">Continuar</button></div>`;
+  h+=`<button class="opt" id="obBack" style="text-align:center;background:none">${step>0?'Volver':'Volver a mi cuenta'}</button><button class="opt" id="obSkip" style="text-align:center;background:none;color:var(--red);border-color:var(--red)">Omitir encuesta</button>`;
+  $('obBody').innerHTML=h;
+  document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{ans[s.k]=+b.dataset.o;next()});
+  const n=$('obNext');if(n)n.onclick=()=>{const isN=s.type!=='text',v=isN?String(pv('obIn')):$('obIn').value.trim();
+    if(s.type==='num'?!(+v>0):s.type==='text'&&!v)return toast('Completa este dato para continuar.',1);
+    ans[s.k]=isN?Math.floor(+v):v;next()};
+  const b=$('obBack');if(b)b.onclick=()=>{if(step>0){step--;drawStep()}else{$('ob').classList.remove('on');$('tabs').style.display='';setHub(true);render()}};
+  $('obSkip').onclick=skipSurvey;
+}
+function next(){step++;step<STEPS.length?drawStep():finishSurvey()}
+function buildProfile(a){
+  const needs=Math.min(70,Math.max(30,Math.round(a.fixed/a.income*100))),R=100-needs;
+  let w=[22,15,28][a.habit],e=[30,18,8][a.emerg],d=a.debt===2?30:a.debt===1?20:(a.goal===3?22:14),g=20;
+  if(a.goal===4)e+=12;if(a.goal===3&&a.debt===0)d+=4;if(a.goal<3)g+=4;
+  const tot=w+e+d+g,raw=[w,e,g,d].map(x=>Math.round(x/tot*R));
+  const pct=[needs,raw[0],raw[1],raw[2],raw[3]];pct[0]+=100-pct.reduce((x,y)=>x+y,0);
+  const goalName=['Viaje y gustos','Compra importante','Estudios','Metas','Metas'][a.goal];
+  const names=['Necesidades','Deseos','Fondo de emergencia',goalName,a.debt>0?'Pago de deudas':'Inversión'];
+  let type='Equilibrado';
+  if(a.debt===2)type='Prioridad: salir de deudas';else if(a.emerg===0)type='Constructor de colchón';
+  else if(a.habit===0)type='Gastador a controlar';else if(a.habit===2&&a.emerg===2&&a.debt===0)type='Ahorrador-inversionista';
+  const why=[];
+  why.push(`Tus gastos obligatorios suman ${fmt(a.fixed)} (${Math.round(a.fixed/a.income*100)}% de tu ingreso), por eso Necesidades queda en ${needs}%.`);
+  if(a.fixed>a.income)why.push('Tus gastos obligatorios superan tu ingreso: conviene revisar dónde recortar.');
+  if(a.debt>0)why.push('Pagar deudas primero te ahorra intereses, que suelen ser más altos que lo que ganarías ahorrando.');
+  if(a.emerg<2)why.push('Antes de invertir conviene tener un colchón de 3 a 6 meses de gastos.');
+  if(a.habit===0)why.push('Un bolsillo de Deseos con monto fijo te ayuda a gastar sin culpa y sin pasarte.');
+  if(a.debt===0&&a.emerg===2)why.push('Con deudas bajo control y colchón listo, puedes darle más peso a invertir.');
+  return {name:a.name,type,pct,names,why,income:a.income,brk:[['Arriendo o dividendo',a.rent||0],['Comida',a.food||0],['Transporte',a.transp||0],['Cuentas básicas',a.bills||0],['Salud o educación',a.other||0]]};
+}
+function skipSurvey(){const nm=(ans.name&&String(ans.name).trim())||'Cliente';
+  S.profile={name:nm,type:'Estándar (sin encuesta)',pct:[50,20,10,10,10],names:['Necesidades','Deseos','Fondo de emergencia','Ahorro y metas','Inversión'],why:['Usé una distribución estándar basada en la regla 50/30/20, adaptada a 5 bolsillos. Puedes personalizarla cuando quieras con "Rehacer encuesta" en Aprender.'],brk:[]};
+  S.pockets.forEach((p,i)=>p.name=S.profile.names[i]);save();
+  $('ob').classList.remove('on');$('tabs').style.display='';go('home');toast('Perfil estándar aplicado.');render()}
+function finishSurvey(){
+  ans.fixed=['rent','food','transp','bills','other'].reduce((s,k)=>s+(ans[k]||0),0);
+  S.profile=buildProfile(ans);S.pockets.forEach((p,i)=>p.name=S.profile.names[i]);save();
+  const P=S.profile;
+  $('obHead').innerHTML=`<h1>Tu perfil: ${esc(P.type)}</h1><p>Distribución más eficiente según tus respuestas</p>`;
+  const tb=P.brk.reduce((s,x)=>s+x[1],0);
+  $('obBody').innerHTML=`<div class="form"><b>Tus gastos obligatorios, sumados</b>${P.brk.filter(x=>x[1]>0).map(x=>`<div class="split row"><span class="mut">${x[0]}</span><b>${fmt(x[1])}</b></div>`).join('')}<div class="split row"><b>Total</b><b>${fmt(tb)}</b></div></div>
+  <div class="form"><b>Tus 5 bolsillos sugeridos</b><div style="margin-top:8px">${P.pct.map((p,i)=>`<div class="pct" style="--k:var(${COLORS[i]})"><span>${esc(P.names[i])}</span><div class="t"><i style="width:${p}%"></i></div><b>${p}%</b></div>`).join('')}</div></div>
+  <div class="form"><b>¿Por qué así?</b>${P.why.map(t=>`<p class="mut" style="margin:6px 0">• ${esc(t)}</p>`).join('')}</div>
+  <div style="padding:0 16px"><button class="btn" id="obGo">Ir a mis bolsillos</button></div>`;
+  $('obGo').onclick=()=>{$('ob').classList.remove('on');$('tabs').style.display='';go('home');toast('Perfil creado. ¡Bienvenido/a!');render()};
+}
+
+/* ---------- Render ---------- */
+function render(){
+  const P=S.profile,sum=S.pockets.reduce((a,p)=>a+p.amt,0),total=S.free+sum,m=v=>hide?'$ ••••••':fmt(v);
+  $('hName').textContent=P?P.name.trim().split(/\s+/)[0]:'Cliente';$('uAv2').textContent=P?P.name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase():'C';
+  $('hbTotal').textContent=m(total);$('hbCta').textContent=m(S.free);$('hbAsig').textContent=m(sum);$('hbSub').textContent=P?S.pockets.length+' bolsillos':'Crea tu perfil y organiza tu plata';drawCard();
+  if(!P)return;
+  $('uName').textContent=P.name;$('uAv').textContent=P.name.trim().charAt(0).toUpperCase();
+  $('hFree').textContent=m(S.free);$('hTotal').textContent=m(total);
+  $('rwCard').innerHTML=rwHTML();$('rwCard2').innerHTML=rwHTML();drawQList();drawVList();
+  $('hPk').innerHTML=S.pockets.map((p,i)=>{const pr=p.goal>0?` · ${Math.min(100,Math.round(p.amt/p.goal*100))}% de meta`:'';
+    return `<div class="pk" data-e="${i}" style="--k:var(${COLORS[i]})" role="button" tabindex="0"><div class="nm"><i class="d"></i><span>${esc(p.name)}<br><span class="mut">Objetivo ${P.pct[i]}%${pr}</span></span></div><b>${m(p.amt)}</b></div>`}).join('');
+  const seg=S.pockets.map((p,i)=>[p.amt,`var(${COLORS[i]})`]).concat([[S.free,'var(--free)']]);
+  $('bar').innerHTML=total?seg.map(s=>`<i style="width:${s[0]/total*100}%;background:${s[1]}"></i>`).join(''):'';
+  $('hLog').innerHTML=S.log.length?S.log.slice(0,5).map(l=>`<div><span>${esc(l.t)}<br><span class="mut">${l.d}</span></span><b>${fmt(l.v)}</b></div>`).join(''):'<div class="mut">Aún no hay movimientos. Abona dinero para empezar.</div>';
+  const opts=x=>['free',0,1,2,3,4].concat(x?['out']:[]).map(k=>`<option value="${k}">${esc(label(String(k)))}</option>`).join('');
+  const f=$('from').value,t=$('to').value;$('from').innerHTML=opts(0);$('to').innerHTML=opts(1);
+  if(f)$('from').value=f;$('to').value=t||'0';
+  const un=total?Math.round(S.free/total*100):0;
+  $('prof').innerHTML=`<b>Tu perfil: ${esc(P.type)}</b><div style="margin-top:8px">${P.pct.map((p,i)=>`<div class="pct" style="--k:var(${COLORS[i]})"><span>${esc(S.pockets[i].name)}</span><div class="t"><i style="width:${p}%"></i></div><b>${p}%</b></div>`).join('')}</div>${P.why.map(x=>`<p class="mut" style="margin:6px 0">• ${esc(x)}</p>`).join('')}<p style="font-size:14px;margin:10px 0 0"><b>Tu situación:</b> ${total===0?'abona dinero para empezar a repartirlo.':un>30?`tienes ${un}% sin asignar. Repartirlo te ayuda a gastar con intención.`:'tu dinero ya está bien organizado en bolsillos.'}</p>`;
+  save();calc();
+}
+function calc(){const m=pv('cm'),y=+$('cy').value,r=(+$('cr').value||0)/100/12,n=y*12;
+  const fv=r?m*((Math.pow(1+r,n)-1)/r):m*n,dep=m*n;
+  $('cout').innerHTML=`Depositas <b>${fmt(dep)}</b><br>Intereses ganados <b>${fmt(Math.max(0,fv-dep))}</b><br>Total al final <b style="font-size:18px">${fmt(fv)}</b>`}
+['cm','cy','cr'].forEach(i=>$(i).addEventListener('input',calc));
+
+/* ---------- Navegación y acciones ---------- */
+function go(n,focus){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id==='s-'+n));
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.go===n));
+  $('screens').scrollTop=0;if(focus)setTimeout(()=>$(focus).focus(),50)}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go,b.dataset.focus));
+$('rwCard').addEventListener('keydown',e=>{if(e.key==='Enter')go('aprender')});
+$('eye').onclick=()=>{hide=!hide;render()};
+let editing=null;
+function openSheet(i){editing=i;$('shN').value=S.pockets[i].name;$('shG').value=S.pockets[i].goal?dots(S.pockets[i].goal):'';$('sheet').classList.add('on')}
+$('hPk').addEventListener('click',e=>{const r=e.target.closest('[data-e]');if(r)openSheet(+r.dataset.e)});
+$('hPk').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('[data-e]');if(r)openSheet(+r.dataset.e)}});
+$('shOk').onclick=()=>{const p=S.pockets[editing];p.name=$('shN').value.trim()||p.name;p.goal=pv('shG');$('sheet').classList.remove('on');toast('Bolsillo actualizado.');render()};
+$('depBtn').onclick=()=>{const v=pv('dep');if(!(v>0))return toast('Ingresa un monto mayor a 0.',1);
+  S.free+=v;addLog('Abono a la cuenta',v);$('dep').value='';toast('Abono realizado: '+fmt(v));render()};
+$('mvBtn').onclick=()=>{const a=$('from').value,b=$('to').value,v=pv('amt');
+  if(!(v>0))return toast('Ingresa un monto mayor a 0.',1);
+  if(a===b)return toast('Elige un origen y un destino distintos.',1);
+  if(get(a)<v)return toast(`No alcanza: ${label(a)} tiene ${fmt(get(a))}.`,1);
+  set(a,get(a)-v);set(b,get(b)+v);addLog(`${label(a)} → ${label(b)}`,v);$('amt').value='';toast('Transferencia realizada.');render()};
+$('sugg').onclick=()=>{const base=S.free;let used=0;
+  S.profile.pct.forEach((q,i)=>{const v=Math.floor(base*q/100);S.pockets[i].amt+=v;used+=v});S.free-=used;
+  if(used)addLog('Distribución según mi perfil',used);
+  toast(used?'Distribución aplicada.':'Abona dinero para poder distribuirlo.',!used);render()};
+$('redo').onclick=()=>showSurvey();
+$('reset').onclick=()=>{if(confirm('¿Borrar todo (incluidos tus puntos) y empezar de cero?')){S=fresh();save();showSurvey()}};
+const setHub=b=>$('phone').classList.toggle('inhub',b);
+function openB(){setHub(false);if(S.profile)go('home');else showSurvey()}
+$('goB').onclick=openB;
+$('goB').addEventListener('keydown',e=>{if(e.key==='Enter')openB()});
+$('toHub').onclick=()=>{setHub(true);render()};
+const NA=()=>toast('Esta función no está incluida en el simulador.',1);
+function openMov(){$('mvBody').innerHTML=S.log.length?'<div class="list" style="margin-top:14px">'+S.log.map(l=>`<div><span>${esc(l.t)}<br><span class="mut">${l.d}</span></span><b>${fmt(l.v)}</b></div>`).join('')+'</div>':'<div class="tip" style="margin-top:14px">Aún no tienes movimientos. Abona dinero desde Bolsillos para empezar.</div>';$('mv').classList.add('on')}
+function qa(k){$('optSheet').classList.remove('on');
+  if(k==='mov')openMov();else if(k==='tr')openTrf();else if(k==='pay')openPay('Pago de cuenta');else if(k==='qr')openPay('Pago QR');else if(k==='cart')openCart();else if(k==='card')openCard();else if(k==='b')openB();else NA()}
+document.querySelectorAll('[data-qa]').forEach(b=>b.onclick=()=>qa(b.dataset.qa));
+/* ---------- Ingreso, pagos, transferencias, cartolas y tarjeta ---------- */
+function showLogin(){$('login').classList.add('on');$('faceBtn').disabled=false;$('faceTxt').textContent='Ingresar con Face ID'}
+$('faceBtn').onclick=()=>{$('faceBtn').disabled=true;$('faceTxt').textContent='Reconociendo rostro…';setTimeout(()=>{$('login').classList.remove('on');toast('¡Bienvenido/a!')},900)};
+function payFill(){$('payF').innerHTML=['free',0,1,2,3,4].map(k=>`<option value="${k}">${esc(label(String(k)))} · ${fmt(get(k))}</option>`).join('')}
+function openPay(kind){$('payK').value=kind;payFill();$('scan').style.display=kind==='Pago QR'?'flex':'none';$('payW').value='';$('payA').value='';$('pay').classList.add('on')}
+$('payK').onchange=()=>{$('scan').style.display=$('payK').value==='Pago QR'?'flex':'none'};
+$('payX').onclick=()=>$('pay').classList.remove('on');
+$('payGo').onclick=()=>{const v=pv('payA'),f=$('payF').value,w=$('payW').value.trim()||'Comercio';
+  if(!(v>0))return toast('Ingresa un monto mayor a 0.',1);
+  if(get(f)<v)return toast(`Saldo insuficiente: ${label(f)} tiene ${fmt(get(f))}.`,1);
+  set(f,get(f)-v);addLog(`${$('payK').value} · ${w}`,v);$('pay').classList.remove('on');toast('Pago realizado: '+fmt(v));render()};
+const CT=[['Ana Pérez',1],['Benjamín Soto',0],['Carolina Muñoz',1],['Diego Fuentes',1],['Esteban Vargas',0],['Fernanda Lagos',1],['Gonzalo Reyes',0],['Javiera Tapia',1],['Matías Araya',0],['Valentina Díaz',1]];
+const ini2=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('');
+function trfList(){
+  const row=c=>`<div class="ct" data-c="${esc(c[0])}" role="button" tabindex="0"><span class="ca">${ini2(c[0])}</span><span style="flex:1"><b>${esc(c[0])}</b><br><span class="mut">${c[1]?'Cliente Santander':'Otro banco'}</span></span><button class="star" data-f="${esc(c[0])}" aria-label="Marcar favorito">${S.fav[c[0]]?'★':'☆'}</button></div>`;
+  const fv=CT.filter(c=>S.fav[c[0]]);let h='';
+  if(fv.length)h+=`<h2 style="margin:14px 16px 6px">Favoritos</h2><div class="list">${fv.map(row).join('')}</div>`;
+  const g={};CT.forEach(c=>{(g[c[0][0]]=g[c[0][0]]||[]).push(c)});
+  h+=Object.keys(g).sort().map(L=>`<h2 style="margin:14px 16px 6px">${L}</h2><div class="list">${g[L].map(row).join('')}</div>`).join('');
+  $('trfBody').innerHTML=h;$('trfHead').textContent='Elige un contacto'}
+function trfForm(n){$('trfHead').textContent='Transferencia';
+  $('trfBody').innerHTML=`<div class="form"><b>${esc(n)}</b><div class="mut">${CT.find(c=>c[0]===n)[1]?'Cliente Santander':'Otro banco'}</div><label for="trfA">Monto (CLP)</label><input id="trfA" class="money" type="text" inputmode="numeric" placeholder="0"><div class="mut" style="margin-top:8px">Desde Cuenta Corriente · Disponible ${fmt(S.free)}</div><button class="btn" id="trfGo">Transferir</button><button class="btn sec" id="trfBack">Cambiar contacto</button></div>`;
+  $('trfBack').onclick=trfList;
+  $('trfGo').onclick=()=>{const v=pv('trfA');if(!(v>0))return toast('Ingresa un monto mayor a 0.',1);
+    if(v>S.free)return toast(`Saldo insuficiente: tienes ${fmt(S.free)} disponibles.`,1);
+    S.free-=v;addLog('Transferencia a '+n,v);$('trf').classList.remove('on');toast('Transferencia realizada a '+n);render()}}
+function openTrf(){trfList();$('trf').classList.add('on')}
+$('trfX').onclick=()=>$('trf').classList.remove('on');
+$('trfBody').addEventListener('click',e=>{const f=e.target.closest('[data-f]');
+  if(f){S.fav[f.dataset.f]=!S.fav[f.dataset.f];save();trfList();return}
+  const c=e.target.closest('[data-c]');if(c)trfForm(c.dataset.c)});
+function openCart(){const sum=fn=>S.log.filter(fn).reduce((a,l)=>a+l.v,0),ab=sum(l=>l.t.startsWith('Abono')),ca=sum(l=>/^(Pago|Transferencia a)/.test(l.t)),tot=S.free+S.pockets.reduce((a,p)=>a+p.amt,0),mes=new Date().toLocaleDateString('es-CL',{month:'long',year:'numeric'});
+  $('cartBody').innerHTML=`<div class="form"><b>Cartola · ${mes}</b><div class="split row"><span class="mut">Abonos</span><b>${fmt(ab)}</b></div><div class="split row"><span class="mut">Cargos</span><b>${fmt(ca)}</b></div><div class="split row"><span class="mut">Saldo total</span><b>${fmt(tot)}</b></div></div><div class="note">Resumen de este simulador. No es una cartola oficial.</div>`;$('cart').classList.add('on')}
+$('cartX').onclick=()=>$('cart').classList.remove('on');
+function drawCard(){const b=S.blocked;$('ccSt').textContent=b?'Bloqueada':'Activa';$('ccBtn').textContent=b?'Desbloquear tarjeta':'Bloquear tarjeta';$('ccard').style.opacity=b?.5:1;$('hbCard').textContent=b?'Bloqueada':'Activa';$('ccName').textContent=(S.profile?S.profile.name:'Cliente').toUpperCase()}
+function openCard(){drawCard();$('cardSheet').classList.add('on')}
+$('goC').onclick=openCard;$('goC').addEventListener('keydown',e=>{if(e.key==='Enter')openCard()});
+$('ccBtn').onclick=()=>{S.blocked=!S.blocked;save();drawCard();toast(S.blocked?'Tarjeta bloqueada.':'Tarjeta desbloqueada.')};
+$('ccX').onclick=()=>$('cardSheet').classList.remove('on');
+function openAc(){$('acA').value=S.free?dots(S.free):'';$('acSheet').classList.add('on')}
+$('goA').onclick=openAc;$('goA').addEventListener('keydown',e=>{if(e.key==='Enter')openAc()});
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const t=pv('acA')+(+b.dataset.add);$('acA').value=dots(t)});
+$('acX').onclick=()=>$('acSheet').classList.remove('on');
+$('acOk').onclick=()=>{const v=pv('acA'),d=v-S.free;$('acSheet').classList.remove('on');if(d===0)return;
+  S.free=v;if(d>0)addLog('Abono a la cuenta',d);else addLog('Ajuste de saldo',-d);toast('Monto actualizado: '+fmt(v));render()};
+$('mvX').onclick=()=>$('mv').classList.remove('on');
+$('allOpt').onclick=()=>$('optSheet').classList.add('on');
+$('optX').onclick=()=>$('optSheet').classList.remove('on');
+$('eyeH').onclick=()=>{hide=!hide;render()};
+$('uAv').onclick=$('uAv2').onclick=()=>{$('uSn').textContent=S.profile?S.profile.name:'';$('uSheet').classList.add('on')};
+$('loc').onclick=()=>$('uSheet').classList.remove('on');
+$('lo').onclick=()=>{$('uSheet').classList.remove('on');S=fresh();save();hide=false;go('home');$('ob').classList.remove('on');$('tabs').style.display='';setHub(true);render();showLogin()};
+const tick=()=>$('clock').textContent=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false});
+tick();setInterval(tick,30000);
+setHub(true);render();
+</script>
+</body>
+</html>
